@@ -31,9 +31,9 @@ HOMEWORK_VERDICTS = {
 
 def check_tokens() -> bool:
     """
-    Проверяет доступность переменных окружения, которые необходимы для работы
-    программы. Если отсутствует хотя бы одна переменная окружения —
-    бот прекращает работу
+    Проверяет доступность переменных окружения, которые необходимы для работы.
+    Если отсутствует хотя бы одна переменная окружения —
+    бот прекращает работу.
     """
     logging.info('Проверяем доступность переменных окружения')
     return all([PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID])
@@ -41,13 +41,13 @@ def check_tokens() -> bool:
 
 def send_message(bot: telegram.bot.Bot, message: str) -> None:
     """
-    Отправляет сообщение в Telegram чат,
+    Отправляет сообщение в Telegram чат.
     определяемый переменной окружения TELEGRAM_CHAT_ID
     """
     try:
         logging.info('Отправка статуса в telegram')
         bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
-        logging.debug(f'Успешная отправка сообщения')
+        logging.debug('Успешная отправка сообщения')
     except Exception as error:
         logging.error(f'Ошибка отправки сообщения в Telegram - {error}')
         raise Exception(f'Ошибка при отправке сообщения-статус: {error}')
@@ -110,7 +110,6 @@ def parse_status(homework: dict) -> str:
     В случае успеха, функция возвращает подготовленную для отправки в Telegram
     строку, содержащую один из вердиктов словаря HOMEWORK_VERDICTS.
     """
-
     logging.info('Извлекаем статус работы для отправки в Telegram')
     if 'homework_name' not in homework:
         logging.error('Нет ключа homework_name в ответе API')
@@ -129,7 +128,6 @@ def parse_status(homework: dict) -> str:
 
 def main():
     """Основная логика работы бота и логирование."""
-
     log = '%(filename)s, %(asctime)s, %(name)s, %(levelname)s, %(message)s'
     logging.basicConfig(
         handlers=[
