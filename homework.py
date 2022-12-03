@@ -17,7 +17,7 @@ PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
-RETRY_PERIOD = 600
+RETRY_PERIOD = 10
 ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
 HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 
@@ -47,7 +47,7 @@ def send_message(bot: telegram.bot.Bot, message: str) -> None:
     try:
         logging.info('Отправка статуса в telegram')
         bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
-        logging.debug('Успешная отправка сообщения')
+        logging.debug(f'Успешная отправка сообщения: {message}')
     except Exception as error:
         logging.error(f'Ошибка отправки сообщения в Telegram - {error}')
         raise Exception(f'Ошибка при отправке сообщения-статус: {error}')
@@ -61,7 +61,8 @@ def get_api_answer(current_timestamp: int) -> dict:
     приведя его из формата JSON к типам данных Python
     """
     timestamp = current_timestamp or int(time.time())
-    logging.info(f'Запрос к API. URL: {ENDPOINT}, время: {timestamp}')
+    logging.info(f'<><><><><><><><><>><><><><><><><><><><><><><><><><><><><>>'
+                 f'Запрос к API. URL: {ENDPOINT}, время: {timestamp}')
     payload = {'from_date': timestamp}
     try:
         response = requests.get(ENDPOINT, headers=HEADERS, params=payload)
@@ -152,9 +153,7 @@ def main():
     while True:
         try:
             response = get_api_answer(current_timestamp)
-            current_timestamp = response.get(
-                'current_date', int(time.time())
-            )
+            current_timestamp = response.get('current_date')
             homeworks_response = check_response(response)
             if homeworks_response:
                 message = parse_status(homeworks_response[0])
