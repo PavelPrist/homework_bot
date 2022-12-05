@@ -60,10 +60,10 @@ def get_api_answer(current_timestamp: int) -> dict:
     В случае успешного запроса должна вернуть ответ API,
     приведя его из формата JSON к типам данных Python
     """
-    timestamp = current_timestamp or int(time.time())
     logging.info(f'<><><><><><><><><>><><><><><><><><><><><><><><><><><><><>>'
-                 f'Запрос к API. URL: {ENDPOINT}, время: {timestamp}')
-    payload = {'from_date': timestamp}
+                 f'\n---> Запрос к API. URL: {ENDPOINT}, '
+                 f'\n---> время: {current_timestamp}')
+    payload = {'from_date': current_timestamp}
     try:
         response = requests.get(ENDPOINT, headers=HEADERS, params=payload)
         if response.status_code != HTTPStatus.OK:
@@ -139,7 +139,6 @@ def main():
         level=logging.DEBUG,
         format=log,
     )
-
     if not check_tokens():
         message = 'Отсутствуют переменные окружения. Бот прекращает работу!'
         logging.critical(message)
@@ -150,6 +149,7 @@ def main():
     current_timestamp = 1667322796
     send_message(bot, 'Telegram bot начал работу')
     last_message = ''
+    error_message = ''
     while True:
         try:
             response = get_api_answer(current_timestamp)
@@ -162,11 +162,14 @@ def main():
             if message != last_message:
                 send_message(bot, message)
                 last_message = message
-                logging.info(f'Получен новый статус домашней работы:{message}')
+                logging.info(
+                    f'Отправлен новый статус домашней работы:{message}')
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
-            logging.error(message, exc_info=True)
-            send_message(bot, message)
+            if message != error_message:
+                logging.error(message, exc_info=True)
+                send_message(bot, message)
+                error_message = message
         finally:
             time.sleep(RETRY_PERIOD)
 
